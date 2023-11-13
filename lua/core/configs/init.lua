@@ -1,0 +1,7 @@
+require('core.configs.lsp')
+require('core.configs.colorscheme')
+require('core.configs.treesitter')
+require('core.configs.lualine')
+require('core.configs.telescope')
+require('core.configs.harpoon')
+require('core.configs.cmp')
