@@ -1,84 +1,155 @@
 require('lazy').setup({
+  {
     'nvim-lualine/lualine.nvim',
-    {
-        'nvim-telescope/telescope.nvim',
-        branch = '0.1.x',
-        dependencies = {
-            'nvim-lua/plenary.nvim',
-            -- Fuzzy Finder Algorithm which requires local dependencies to be built.
-            -- Only load if `make` is available. Make sure you have the system
-            -- requirements installed.
-            {
-                'nvim-telescope/telescope-fzf-native.nvim',
-                -- NOTE: If you are having trouble with this installation,
-                --       refer to the README for telescope-fzf-native for more instructions.
-                build = 'make',
-                cond = function()
-                    return vim.fn.executable 'make' == 1
-                end,
-            },
-        },
-    },
+    dependencies = { 'nvim-tree/nvim-web-devicons', opt = true }
 
-    'EmranMR/tree-sitter-blade',
-    'mattn/emmet-vim',
-    {
-        "windwp/nvim-autopairs",
-        config = function() require("nvim-autopairs").setup {} end
-    },
-    "windwp/nvim-ts-autotag",
-    {
-        'nvim-treesitter/nvim-treesitter',
-        run = function()
-            local ts_update = require('nvim-treesitter.install').update({ with_sync = true })
-            ts_update()
-        end,
-    },
+  },
 
-    "nvim-treesitter/nvim-treesitter-context",
+  'jwalton512/vim-blade',
 
-    'nvim-treesitter/playground',
+  {
+    "rose-pine/neovim",
+    name = 'rose-pine',
+    lazy = false,
+    priority = 1000,
+  },
 
-    {
-        -- LSP Configuration & Plugins
-        'neovim/nvim-lspconfig',
-        dependencies = {
-            -- Automatically install LSPs to stdpath for neovim
-            'williamboman/mason.nvim',
-            'williamboman/mason-lspconfig.nvim',
+  {
+    'nvim-telescope/telescope.nvim',
+    event = "BufWinEnter",
+    config = function()
+      local builtin = require('telescope.builtin')
+      vim.keymap.set('n', '<leader>pf', builtin.find_files, {})
+      vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+      vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
+      vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+    end,
+    dependencies = { 'nvim-lua/plenary.nvim' },
+  },
 
-            -- Useful status updates for LSP
-            -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-            { 'j-hui/fidget.nvim', tag = 'legacy', opts = {} },
+  {
+    "windwp/nvim-autopairs",
+    config = function() require("nvim-autopairs").setup {} end
+  },
 
-            -- Additional lua configuration, makes nvim stuff amazing!
-            'folke/neodev.nvim',
-        },
-    },
+  { 'nvim-treesitter/nvim-treesitter', build = ':TSUpdate' },
 
-    {
-        -- Autocompletion
-        'hrsh7th/nvim-cmp',
-        dependencies = {
-            -- Snippet Engine & its associated nvim-cmp source
-            'L3MON4D3/LuaSnip',
-            'saadparwaiz1/cmp_luasnip',
+  'nvim-treesitter/nvim-treesitter-context',
 
-            -- Adds LSP completion capabilities
-            'hrsh7th/cmp-nvim-lsp',
+  'nvim-treesitter/playground',
 
-            -- Adds a number of user-friendly snippets
-            'rafamadriz/friendly-snippets',
-        },
-    },
-    'ThePrimeagen/harpoon',
-    {
-        'rose-pine/neovim',
-        name = 'rose-pine'
+  {
+    'williamboman/mason.nvim',
+    lazy = false,
+    config = true,
+  },
+
+  'williamboman/mason-lspconfig.nvim',
+  -- LSP Support
+  {
+    'VonHeikemen/lsp-zero.nvim',
+    branch = 'v3.x',
+    lazy = true,
+    config = false,
+  },
+
+  {
+    'neovim/nvim-lspconfig',
+    dependencies = {
+      {
+        'hrsh7th/cmp-nvim-lsp',
+        'folke/neodev.nvim',
+      },
     }
-}, {})
+  },
+
+  {
+    -- Autocompletion
+    'hrsh7th/nvim-cmp',
+    event = { "InsertEnter", "CmdlineEnter" },
+    dependencies = {
+      -- Snippet Engine & its associated nvim-cmp source
+      'L3MON4D3/LuaSnip',
+      'saadparwaiz1/cmp_luasnip',
+      -- Adds a number of user-friendly snippets
+      'rafamadriz/friendly-snippets',
+    },
+  },
+  {
+    "folke/trouble.nvim",
+    dependencies = { "nvim-tree/nvim-web-devicons" },
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    },
+  },
+
+  "tpope/vim-fugitive",
+
+  'ThePrimeagen/harpoon',
+
+  'laytan/cloak.nvim',
+
+  "mbbill/undotree",
+
+  {
+    "ThePrimeagen/refactoring.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+    },
+    config = function()
+      require("refactoring").setup()
+    end,
+  },
+
+  "folke/zen-mode.nvim",
+
+  {
+    "christoomey/vim-tmux-navigator",
+    lazy = false
+  },
 
 
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    opts = {
+      -- add any options here
+    },
+    dependencies = {
+      -- if you lazy-load any plugin below, make sure to add proper `module="..."` entries
+      "MunifTanjim/nui.nvim",
+      -- OPTIONAL:
+      --   `nvim-notify` is only needed, if you want to use the notification view.
+      --   If not available, we use `mini` as the fallback
+      "rcarriga/nvim-notify",
+    }
+  },
 
+  {
+    'olivercederborg/poimandres.nvim',
+    lazy = false,
+    priority = 1000,
+  },
 
+  {
+    "nvim-tree/nvim-tree.lua",
+    version = "*",
+    lazy = false,
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
+    config = function()
+      require("nvim-tree").setup {}
+    end,
+  },
 
+  {
+    "folke/tokyonight.nvim",
+    lazy = false,
+    priority = 1000,
+    opts = {},
+  }
+})
