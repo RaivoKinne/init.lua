@@ -28,8 +28,6 @@ vim.opt.isfname:append("@-@")
 
 vim.opt.updatetime = 50
 
-vim.g.mapleader = " "
-
 vim.cmd [[autocmd BufWritePre <buffer> lua vim.lsp.buf.format()]]
 vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
 
