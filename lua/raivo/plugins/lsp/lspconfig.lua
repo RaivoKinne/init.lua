@@ -1,183 +1,227 @@
 return {
-  "neovim/nvim-lspconfig",
-  event = { "BufReadPre", "BufNewFile" },
-  dependencies = {
-    "hrsh7th/cmp-nvim-lsp",
-    { "antosha417/nvim-lsp-file-operations", config = true },
-  },
-  config = function()
-    -- import lspconfig plugin
-    local lspconfig = require("lspconfig")
+	"neovim/nvim-lspconfig",
+	event = { "BufReadPre", "BufNewFile" },
+	dependencies = {
+		"hrsh7th/cmp-nvim-lsp",
+		{ "antosha417/nvim-lsp-file-operations", config = true },
+	},
+	config = function()
+		-- import lspconfig plugin
+		local lspconfig = require("lspconfig")
 
-    local util = lspconfig.util
+		local util = lspconfig.util
+		-- import cmp-nvim-lsp plugin
+		local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
-    -- import cmp-nvim-lsp plugin
-    local cmp_nvim_lsp = require("cmp_nvim_lsp")
+		local on_attach = function(client, bufnr)
+			local opts = { buffer = bufnr, remap = false }
 
-    local keymap = vim.keymap -- for conciseness
+			client.server_capabilities.semanticTokensProvider = nil
 
-    local opts = { noremap = true, silent = true }
-    local on_attach = function(client, bufnr)
-      opts.buffer = bufnr
-      client.server_capabilities.semanticTokensProvider = nil
+			vim.keymap.set("n", "gd", function()
+				vim.lsp.buf.definition()
+			end, opts)
+			vim.keymap.set("n", "K", function()
+				vim.lsp.buf.hover()
+			end, opts)
+			vim.keymap.set("n", "<leader>vws", function()
+				vim.lsp.buf.workspace_symbol()
+			end, opts)
+			vim.keymap.set("n", "<leader>vd", function()
+				vim.diagnostic.open_float()
+			end, opts)
+			vim.keymap.set("n", "[d", function()
+				vim.diagnostic.goto_next()
+			end, opts)
+			vim.keymap.set("n", "]d", function()
+				vim.diagnostic.goto_prev()
+			end, opts)
+			vim.keymap.set("n", "<leader>ca", function()
+				vim.lsp.buf.code_action()
+			end, opts)
+			vim.keymap.set("n", "<leader>rr", function()
+				vim.lsp.buf.references()
+			end, opts)
+			vim.keymap.set("n", "<leader>rn", function()
+				vim.lsp.buf.rename()
+			end, opts)
+			vim.keymap.set("i", "<C-h>", function()
+				vim.lsp.buf.signature_help()
+			end, opts)
+		end
 
-      -- set keybinds
-      opts.desc = "Show LSP references"
-      keymap.set("n", "gR", "<cmd>Telescope lsp_references<CR>", opts) -- show definition, references
+		-- used to enable autocompletion (assign to every lsp server config)
+		local capabilities = cmp_nvim_lsp.default_capabilities()
 
-      opts.desc = "Go to declaration"
-      keymap.set("n", "gD", vim.lsp.buf.declaration, opts) -- go to declaration
+		-- Change the Diagnostic symbols in the sign column (gutter)
+		-- (not in youtube nvim video)
+		local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+		for type, icon in pairs(signs) do
+			local hl = "DiagnosticSign" .. type
+			vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+		end
 
-      opts.desc = "Show LSP definitions"
-      keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- show lsp definitions
+		-- configure html server
+		lspconfig["html"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+			filetypes = { "php", "html", "rust", "blade" },
+		})
 
-      opts.desc = "Show LSP implementations"
-      keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- show lsp implementations
+		lspconfig["ocamllsp"].setup({
+			cmd = { "ocamllsp" },
+			capabilities = capabilities,
+			on_attach = on_attach,
+			filetypes = { "ocaml", "ocaml.menhir", "ocaml.interface", "ocaml.ocamllex", "reason", "dune" },
+			root_dir = util.root_pattern(
+				"*.opam",
+				"esy.json",
+				"package.json",
+				".git",
+				"dune-project",
+				"dune-workspace"
+			),
+		})
 
-      opts.desc = "Show LSP type definitions"
-      keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
+		-- configure typescript server with plugin
+		lspconfig["tsserver"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+		})
 
-      opts.desc = "See available code actions"
-      keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
+		-- configure css server
+		lspconfig["cssls"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+		})
 
-      opts.desc = "Show buffer diagnostics"
-      keymap.set("n", "<leader>D", "<cmd>Telescope diagnostics bufnr=0<CR>", opts) -- show  diagnostics for file
+		-- configure tailwindcss server
+		lspconfig["tailwindcss"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+		})
 
-      opts.desc = "Show line diagnostics"
-      keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts) -- show diagnostics for line
+		-- configure svelte server
+		lspconfig["svelte"].setup({
+			capabilities = capabilities,
+			on_attach = function(client, bufnr)
+				on_attach(client, bufnr)
 
-      opts.desc = "Go to previous diagnostic"
-      keymap.set("n", "[d", vim.diagnostic.goto_prev, opts) -- jump to previous diagnostic in buffer
+				vim.api.nvim_create_autocmd("BufWritePost", {
+					pattern = { "*.js", "*.ts" },
+					callback = function(ctx)
+						if client.name == "svelte" then
+							client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.file })
+						end
+					end,
+				})
+			end,
+		})
 
-      opts.desc = "Go to next diagnostic"
-      keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
+		-- configure prisma orm server
+		lspconfig["prismals"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+		})
 
-      opts.desc = "Show documentation for what is under cursor"
-      keymap.set("n", "K", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
+		-- configure graphql language server
+		lspconfig["graphql"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+			filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
+		})
 
-      opts.desc = "Restart LSP"
-      keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
-    end
+		-- configure emmet language server
+		lspconfig["emmet_ls"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+			filetypes = {
+				"html",
+				"typescriptreact",
+				"javascriptreact",
+				"css",
+				"sass",
+				"scss",
+				"less",
+				"svelte",
+				"blade",
+			},
+		})
 
-    -- used to enable autocompletion (assign to every lsp server config)
-    local capabilities = cmp_nvim_lsp.default_capabilities()
+		-- configure python server
+		lspconfig["pyright"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+		})
 
-    -- Change the Diagnostic symbols in the sign column (gutter)
-    -- (not in youtube nvim video)
-    local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-    for type, icon in pairs(signs) do
-      local hl = "DiagnosticSign" .. type
-      vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-    end
+		-- configure htmx server
+		lspconfig["htmx"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+			filetypes = { "html", "php", "rust", "go", "tsx", "jsx" },
+		})
 
-    -- configure html server
-    lspconfig["html"].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-    })
+		-- configure intelephense server
+		lspconfig["intelephense"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+			filetypes = { "php" },
+			root_dir = util.root_pattern("composer.json", ".git", "php"),
+		})
 
-    -- configure typescript server with plugin
-    lspconfig["tsserver"].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-    })
+		lspconfig["rust_analyzer"].setup({
+			cmd = { "rust-analyzer" },
+			capabilities = capabilities,
+			on_attach = on_attach,
+			filetypes = { "rust" },
+			root_dir = util.root_pattern("Cargo.toml", ".git"),
+		})
+		lspconfig["gopls"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+			filetypes = { "go" },
+			root_dir = util.root_pattern("go.mod", ".git", "go"),
+		})
 
-    -- configure css server
-    lspconfig["cssls"].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-    })
+		lspconfig["zls"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+			filetypes = { "zig" },
+			root_dir = util.root_pattern(".git"),
+		})
 
-    -- configure tailwindcss server
-    lspconfig["tailwindcss"].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-    })
+		lspconfig["elixirls"].setup({
+			cmd = { "/home/nigga/.local/share/nvim/mason/packages/elixir-ls/language_server.sh" },
+			capabilities = capabilities,
+			on_attach = on_attach,
+			filetypes = { "elixir", "eelixir", "heex", "surface" },
+			root_dir = util.root_pattern("mix.exs", ".git", "exs"),
+		})
 
-    -- configure svelte server
-    lspconfig["svelte"].setup({
-      capabilities = capabilities,
-      on_attach = function(client, bufnr)
-        on_attach(client, bufnr)
+		lspconfig["jsonls"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+		})
 
-        vim.api.nvim_create_autocmd("BufWritePost", {
-          pattern = { "*.js", "*.ts" },
-          callback = function(ctx)
-            if client.name == "svelte" then
-              client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.file })
-            end
-          end,
-        })
-      end,
-    })
-
-    -- configure prisma orm server
-    lspconfig["prismals"].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-    })
-
-    -- configure graphql language server
-    lspconfig["graphql"].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-      filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
-    })
-
-    -- configure emmet language server
-    lspconfig["emmet_ls"].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-      filetypes = { "html", "typescriptreact", "javascriptreact", "css", "sass", "scss", "less", "svelte", "php", "blade" },
-    })
-
-    -- configure python server
-    lspconfig["pyright"].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-    })
-
-    -- configure htmx server
-    lspconfig["htmx"].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-      filetypes = { "html", "php", "rust", "go", "tsx", "jsx" }
-    })
-
-    -- configure intelephense server
-    lspconfig["intelephense"].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-      filetypes = { "php" },
-      root_dir = util.root_pattern("composer.json", ".git")
-    })
-
-    lspconfig["rust_analyzer"].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-      filetypes = { "rust" },
-      root_dir = util.root_pattern("Cargo.toml", ".git")
-    })
-
-    -- configure lua server (with special settings)
-    lspconfig["lua_ls"].setup({
-      capabilities = capabilities,
-      on_attach = on_attach,
-      settings = { -- custom settings for lua
-        Lua = {
-          -- make the language server recognize "vim" global
-          diagnostics = {
-            globals = { "vim" },
-          },
-          workspace = {
-            -- make language server aware of runtime files
-            library = {
-              [vim.fn.expand("$VIMRUNTIME/lua")] = true,
-              [vim.fn.stdpath("config") .. "/lua"] = true,
-            },
-          },
-        },
-      },
-    })
-  end,
+		-- configure lua server (with special settings)
+		lspconfig["lua_ls"].setup({
+			capabilities = capabilities,
+			on_attach = on_attach,
+			settings = { -- custom settings for lua
+				Lua = {
+					-- make the language server recognize "vim" global
+					diagnostics = {
+						globals = { "vim" },
+					},
+					workspace = {
+						-- make language server aware of runtime files
+						library = {
+							[vim.fn.expand("$VIMRUNTIME/lua")] = true,
+							[vim.fn.stdpath("config") .. "/lua"] = true,
+						},
+					},
+				},
+			},
+		})
+	end,
 }

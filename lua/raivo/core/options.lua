@@ -1,16 +1,19 @@
+vim.opt.guicursor = ""
+
 vim.opt.nu = true
 vim.opt.relativenumber = true
 
-vim.opt.tabstop = 2
-vim.opt.softtabstop = 2
-vim.opt.shiftwidth = 2
+vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+
+vim.opt.tabstop = 4
+vim.opt.softtabstop = 4
+vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 
 vim.opt.smartindent = true
 
-vim.opt.wrap = false
-
-vim.api.nvim_set_option('clipboard', 'unnamedplus')
+vim.opt.wrap = true
 
 vim.opt.swapfile = false
 vim.opt.backup = false
@@ -26,13 +29,13 @@ vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 
+vim.g.netrw_banner = 0
+
+vim.o.breakindent = true
+
+vim.o.completeopt = "menuone,noselect"
+
 vim.opt.updatetime = 50
 
-vim.cmd [[autocmd BufWritePre <buffer> lua vim.lsp.buf.format()]]
-vim.cmd [[autocmd BufWritePre * lua vim.lsp.buf.format()]]
-
-vim.g.netrw_browse_split = 0
-vim.g.netrw_banner = 0
-vim.g.netrw_winsize = 25
-vim.g.loaded_netrw = 1
-vim.g.loaded_netrwPlugin = 1
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "

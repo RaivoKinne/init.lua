@@ -1,19 +1,10 @@
 return {
-  'rose-pine/neovim',
-  name = 'rose-pine',
-  lazy = false,
-  priority = 1000,
-  config = function()
-    require('rose-pine').setup({
-      variant = 'auto',
-      disable_background = true,
-      disable_float_background = true,
-      disable_italics = true,
-    })
-  end,
-
-  -- optionally set the colorscheme within lazy config
-  init = function()
-    vim.cmd("colorscheme rose-pine")
-  end
+	"sainnhe/sonokai",
+	lazy = false,
+	priority = 1000,
+	config = function()
+		vim.g.sonokai_style = "andromeda"
+		vim.g.sonokai_transparent_background = 1
+		vim.cmd("colorscheme sonokai")
+	end,
 }
