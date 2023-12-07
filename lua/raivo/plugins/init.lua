@@ -1,15 +1,13 @@
 return {
-	"nvim-lua/plenary.nvim",
+  "nvim-lua/plenary.nvim",
 
-	"christoomey/vim-tmux-navigator",
+  "christoomey/vim-tmux-navigator",
 
-	"jwalton512/vim-blade",
+  "jwalton512/vim-blade",
 
-	"tjdevries/colorbuddy.vim",
+  "tjdevries/colorbuddy.vim",
 
-	"rktjmp/lush.nvim",
+  "rktjmp/lush.nvim",
 
-	"nvim-treesitter/playground",
-
-	"nvim-treesitter/nvim-treesitter-context",
+  "nvim-treesitter/playground",
 }

@@ -1,41 +1,57 @@
-vim.opt.guicursor = ""
+local opt = vim.opt
+local g = vim.g
+opt.laststatus = 3 -- global statusline
+opt.showmode = false
 
-vim.opt.nu = true
-vim.opt.relativenumber = true
+opt.clipboard = "unnamedplus"
+opt.cursorline = true
 
-vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+-- Indenting
+opt.expandtab = true
+opt.shiftwidth = 2
+opt.smartindent = true
+opt.tabstop = 2
+opt.softtabstop = 2
 
-vim.opt.tabstop = 4
-vim.opt.softtabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.expandtab = true
+opt.fillchars = { eob = " " }
+opt.ignorecase = true
+opt.smartcase = true
+opt.mouse = "a"
 
-vim.opt.smartindent = true
+-- Numbers
+opt.number = true
+opt.numberwidth = 2
+opt.ruler = false
 
-vim.opt.wrap = true
+-- disable nvim intro
+opt.shortmess:append "sI"
 
-vim.opt.swapfile = false
-vim.opt.backup = false
-vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
-vim.opt.undofile = true
+opt.signcolumn = "yes"
+opt.splitbelow = true
+opt.splitright = true
+opt.termguicolors = true
+opt.timeoutlen = 400
+opt.undofile = true
 
-vim.opt.hlsearch = false
-vim.opt.incsearch = true
+-- interval for writing swap file to disk, also used by gitsigns
+opt.updatetime = 250
 
-vim.opt.termguicolors = true
+g.mapleader = " "
+opt.guicursor = ""
 
-vim.opt.scrolloff = 8
-vim.opt.signcolumn = "yes"
-vim.opt.isfname:append("@-@")
+opt.relativenumber = true
 
-vim.g.netrw_banner = 0
+opt.swapfile = false
+opt.backup = false
+opt.undodir = os.getenv "HOME" .. "/.vim/undodir"
+
+opt.hlsearch = false
+opt.incsearch = true
+
+opt.scrolloff = 8
+opt.signcolumn = "yes"
+opt.isfname:append "@-@"
 
 vim.o.breakindent = true
 
 vim.o.completeopt = "menuone,noselect"
-
-vim.opt.updatetime = 50
-
-vim.g.mapleader = " "
-vim.g.maplocalleader = " "

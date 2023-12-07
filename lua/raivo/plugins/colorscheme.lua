@@ -1,10 +1,17 @@
 return {
-	"sainnhe/sonokai",
-	lazy = false,
-	priority = 1000,
-	config = function()
-		vim.g.sonokai_style = "andromeda"
-		vim.g.sonokai_transparent_background = 1
-		vim.cmd("colorscheme sonokai")
-	end,
+  "rose-pine/neovim",
+  lazy = false,
+  priority = 1000,
+  config = function()
+    require("rose-pine").setup {
+      --- @usage 'auto'|'main'|'moon'|'dawn'
+      variant = "main",
+      disable_italics = true,
+      disable_background = true,
+      disable_float_background = true,
+    }
+  end,
+  init = function()
+    vim.cmd "colorscheme rose-pine"
+  end,
 }

@@ -2,7 +2,7 @@ vim.keymap.set("n", "<leader>pv", vim.cmd.Ex)
 vim.keymap.set("n", "<leader>rp", ":%s/")
 
 vim.keymap.set("n", "<leader>rcu", function()
-	require("crates").upgrade_all_crates()
+  require("crates").upgrade_all_crates()
 end)
 
 vim.keymap.set("n", "<C-s>", "<cmd>:w<CR>")
@@ -46,5 +46,5 @@ vim.keymap.set("n", "<C-j>", vim.cmd.TmuxNavigateDown)
 vim.keymap.set("n", "<C-k>", vim.cmd.TmuxNavigateUp)
 
 vim.keymap.set("n", "<leader><leader>", function()
-	vim.cmd("so")
+  vim.cmd "so"
 end)
