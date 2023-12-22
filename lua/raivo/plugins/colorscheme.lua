@@ -5,10 +5,10 @@ return {
   config = function()
     require("rose-pine").setup {
       --- @usage 'auto'|'main'|'moon'|'dawn'
-      variant = "main",
-      disable_italics = true,
+      variant = "auto",
       disable_background = true,
       disable_float_background = true,
+      disable_italics = true,
     }
   end,
   init = function()

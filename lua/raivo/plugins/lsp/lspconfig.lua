@@ -141,7 +141,6 @@ return {
         "sass",
         "scss",
         "less",
-        "php",
         "svelte",
         "blade",
       },
@@ -198,6 +197,7 @@ return {
     }
 
     lspconfig["jsonls"].setup {
+      cmd = { "jsonls" },
       capabilities = capabilities,
       on_attach = on_attach,
     }
