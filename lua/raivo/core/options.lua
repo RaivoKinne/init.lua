@@ -4,10 +4,6 @@ local g = vim.g
 opt.laststatus = 3
 opt.showmode = false
 
-api.nvim_set_hl(0, "Normal", { bg = "none" })
-api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-
-opt.clipboard = "unnamedplus"
 opt.cursorline = true
 -- Indenting
 opt.expandtab = true

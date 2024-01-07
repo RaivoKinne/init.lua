@@ -5,7 +5,7 @@ return {
   opts = {
     options = {
       icons_enabled = false,
-      theme = "onedark",
+      theme = "horizon",
       component_separators = "|",
       section_separators = "",
     },
